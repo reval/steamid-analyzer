@@ -146,14 +146,30 @@ function findClosestDate (sid) {
 	return steamIDDates[lowestSteamID];
 }
 
+function isYearPresentInDateString(dateString) {
+	let yearRegex = /\d{4}$/;
+	let foundYear = dateString.match(yearRegex);
+
+	if (foundYear)
+		return true;
+	else
+		return false;
+}
+
+function addYearToDateIfMissing (dateString) {
+	if (!isYearPresentInDateString(dateString)) {
+		let currentDate = new Date();
+		dateString = dateString + ', ' + currentDate.getFullYear();
+	}
+
+	return dateString;
+}
+
 function calculateAccountAgeInYears(memberSince) {
-	var yearRegex = /\d{4}$/;
-	var foundYear = memberSince.match(yearRegex);
-	
 	var currentDate = new Date();
 	var accountDate = new Date(memberSince);
 	
-	if (!foundYear)
+	if (!isYearPresentInDateString(memberSince))
 		accountDate.setFullYear(currentDate.getFullYear());
 	
 	var accountAge = dateArithmetic.diff(accountDate, currentDate, "year", 1);
@@ -204,15 +220,7 @@ function displayAccountInfo (steam2ID) {
 					var isPrivate = '';
 					
 					if (result.profile.memberSince) {
-						memberSince = result.profile.memberSince[0];
-
-						var yearRegex = /\d{4}$/;
-						var foundYear = memberSince.match(yearRegex);
-
-						if (!foundYear) {
-							var currentDate = new Date();
-							memberSince = memberSince + ',' + currentDate.getFullYear();
-						}
+						memberSince = addYearToDateIfMissing(result.profile.memberSince[0]);
 					}
 					else {
 						memberSince = findClosestDate(sid);
