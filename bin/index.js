@@ -68,14 +68,13 @@ function getSteamIDToDatesJSONURL() {
 			console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_URL}`);
 			console.log("\n");
 			if (options.g) {
-				readGameTXT();
+				inputSteamIDs = fs.readFileSync('game.txt', 'utf-8');
 				filterAndDisplayInputSteamIDs();
 			} else if (options.i) {
 				for (let steamID of cheaterSteamIDs)
 					displayAccountInfo(steamID);
 			} else if (options.s) {
 				inputSteamIDs = options.steamids;
-				console.log(inputSteamIDs);
 				filterAndDisplayInputSteamIDs();
 			} else {
 				inputSteamIDs = clipboardy.readSync();
@@ -86,11 +85,6 @@ function getSteamIDToDatesJSONURL() {
 			console.log(`Initial data load failed: ${error}`);
 		});
 })()
-
-function readGameTXT () {
-	var data = fs.readFileSync('game.txt', 'utf-8')
-	inputSteamIDs = data;
-}
 
 function filterAndDisplayInputSteamIDs () {
 	var steam2IDRegex = /STEAM_[0-5]:[0-1]:([0-9]+)/g; // Same pattern as in SteamID
@@ -142,7 +136,7 @@ function findClosestDate (sid) {
 			lowestSteamID = knownSteamID;
 		}
 	}
-	
+
 	return steamIDDates[lowestSteamID];
 }
 
@@ -166,13 +160,13 @@ function addYearToDateIfMissing (dateString) {
 }
 
 function calculateAccountAgeInYears(memberSince) {
-	var currentDate = new Date();
-	var accountDate = new Date(memberSince);
+	let currentDate = new Date();
+	let accountDate = new Date(memberSince);
 	
 	if (!isYearPresentInDateString(memberSince))
 		accountDate.setFullYear(currentDate.getFullYear());
 	
-	var accountAge = dateArithmetic.diff(accountDate, currentDate, "year", 1);
+	let accountAge = dateArithmetic.diff(accountDate, currentDate, "year", 1);
 
 	return accountAge.toFixed(2);
 }
