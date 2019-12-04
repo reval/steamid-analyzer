@@ -37,6 +37,7 @@ var fiveToTenExclusive = 0;
 var moreThanTen = 0;
 var vacBannedCount = 0;
 var privateAccountCount = 0;
+var privateAndNewAccountCount = 0;
 var cheatersFoundCount = 0;
 
 function getCheaterJSONURL() {
@@ -101,7 +102,7 @@ function displayStats () {
 		'Accounts Processed: '+requestCount+'\n'+
 		'0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
 		'1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
-		'2-3: '+twoToThreeExclusive+'\n'+
+		'2-3: '+twoToThreeExclusive+'    '+'PRIV & NEW: '+privateAndNewAccountCount+'\n'+
 		'3-4: '+threeToFourExclusive+'\n'+
 		'4-5: '+fourToFiveExclusive+'\n'+
 		'5-10: '+fiveToTenExclusive+'\n'+
@@ -228,7 +229,10 @@ function displayAccountInfo (steam2ID) {
 					var isNew = '';
 					if (accountAge < 1)
 						isNew = 'NEW';
-					
+
+					if (accountAge < 1 && isPrivate)
+						privateAndNewAccountCount++;
+				
 					var isCheater = '';
 					if (cheaterSteamIDs.includes(steam2ID)) {
 						isCheater = 'CHEATER';
