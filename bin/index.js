@@ -234,7 +234,7 @@ function displayAccountInfo (steam2ID) {
 						isCheater = 'CHEATER';
 						cheatersFoundCount++;
 					}
-					console.log(pad(vacBannedString, 3)+' || '+pad(isPrivate, 4)+' || '+pad(isNew, 3)+' || ' + pad(steamNickname, 25) + pad(steam2ID, 20) + ' || ' + pad(accountAge, 5) + ' / '+ pad(memberSince, 20) + ' || ' + sidURL + ' || ' + isCheater);
+					console.log(pad(vacBannedString, 3)+' || '+pad(isPrivate, 4)+' || '+pad(isNew, 3)+' || ' + pad(steamNickname.trim().substr(0, 19), 25) + pad(steam2ID, 20) + ' || ' + pad(accountAge, 5) + ' / '+ pad(memberSince, 20) + ' || ' + sidURL + ' || ' + isCheater);
 				}
 			});
 		})
