@@ -3,8 +3,6 @@
 const dateArithmetic = require("date-arithmetic");
 const yargs = require("yargs");
 const axios = require("axios");
-const chalk = require("chalk");
-const boxen = require("boxen");
 const fs = require("fs");
 const clipboardy = require("clipboardy");
 const pad = require("pad");
@@ -17,14 +15,6 @@ const options = yargs
 	.option("i", { alias: "info", describe: "Read and display Steam2 IDs cheaters.txt" })
 	.option("s", { alias: "steamids", describe: "Display relevant info about a Steam2 ID(s)", type: "string"})
 	.argv;
-	
-const boxenOptions = {
-	padding: 1,
-	margin: 1,
-	borderStyle: "round",
-	borderColor: "green",
-	backgroundColor: "#555555"
-};
 
 const PROFILES_URL = 'http://steamcommunity.com/profiles/';
 const XML_FLAG = '/?xml=1';
@@ -105,20 +95,18 @@ function filterAndDisplayInputSteamIDs () {
 }
 
 function displayStats () {
-	const statsBox = boxen(chalk.white.bold(
-	'Known Cheaters: '+cheaterSteamIDs.length+'\n'+
-	'Cheaters Found: '+cheatersFoundCount+'\n'+
-	'Accounts Processed: '+requestCount+'\n'+
-	'0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
-	'1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
-	'2-3: '+twoToThreeExclusive+'\n'+
-	'3-4: '+threeToFourExclusive+'\n'+
-	'4-5: '+fourToFiveExclusive+'\n'+
-	'5-10: '+fiveToTenExclusive+'\n'+
-	'10+: '+moreThanTen), 
-	boxenOptions);
-	
-	console.log(statsBox);
+	console.log(
+		'Known Cheaters: '+cheaterSteamIDs.length+'\n'+
+		'Cheaters Found: '+cheatersFoundCount+'\n'+
+		'Accounts Processed: '+requestCount+'\n'+
+		'0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
+		'1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
+		'2-3: '+twoToThreeExclusive+'\n'+
+		'3-4: '+threeToFourExclusive+'\n'+
+		'4-5: '+fourToFiveExclusive+'\n'+
+		'5-10: '+fiveToTenExclusive+'\n'+
+		'10+: '+moreThanTen
+	);
 }
 
 function findClosestDate (sid) {
