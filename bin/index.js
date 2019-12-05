@@ -13,8 +13,8 @@ const player = require('play-sound')();
 
 const options = yargs
 	.usage("Usage: Copy Steam2 IDs to clipboard and run.")
-	.option("g", { alias: "game", describe: "Check Steam2 IDs from game.txt file." })
-	.option("i", { alias: "info", describe: "Read and display Steam2 IDs cheaters.txt" })
+	.option("g", { alias: "game", describe: "Read Steam2 IDs from game.txt file." })
+	.option("i", { alias: "info", describe: "Display all known cheaters." })
 	.option("s", { alias: "steamids", describe: "Display relevant info about a Steam2 ID(s)", type: "string"})
 	.option("t", { alias: "tail", describe: "Tail log file for live scanning." })
 	.argv;
