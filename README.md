@@ -9,11 +9,11 @@ Arguments:
 2. -i: Display all known cheaters.
 3. -t: Tail log file for live scanning.  Modify CSGO_LOG_PATH for correct log file path. Sound notification when cheater detected.
 
-Additional Setup:
-1. MPlayer (command line audio player): Required to play sound notifications on Windows. Used in -t mode.
+Additional Setup Requirments for -t Mode:
+1. MPlayer (command line audio player): Required to play sound notifications on Windows.
 HOWTO: https://thisdavej.com/node-js-playing-sounds-to-provide-notifications/
 
-2. Enable CS:GO console logging. Used in -t mode.
+2. Enable CS:GO console logging.
 In your autoexec.cfg add:
 con_logfile "conlog.log"
 
