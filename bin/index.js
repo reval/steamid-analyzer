@@ -13,9 +13,7 @@ const player = require('play-sound')();
 
 const options = yargs
 	.usage("Usage: Copy Steam2 IDs to clipboard and run.")
-	.option("g", { alias: "game", describe: "Read Steam2 IDs from game.txt file." })
 	.option("i", { alias: "info", describe: "Display all known cheaters." })
-	.option("s", { alias: "steamids", describe: "Display relevant info about a Steam2 ID(s)", type: "string"})
 	.option("t", { alias: "tail", describe: "Tail log file for live scanning." })
 	.argv;
 
@@ -63,16 +61,9 @@ function getSteamIDToDatesJSONURL() {
 			console.log(`Loaded ${cheaterSteamIDs.length} cheaters from ${CHEATERS_JSON_URL}`);
 			console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_URL}`);
 			console.log("\n");
-			if (options.g) {
-				inputSteamIDs = fs.readFileSync('game.txt', 'utf-8');
-				filterAndDisplayInputSteamIDs();
-			} else if (options.i) {
+			if (options.i) {
 				for (let steamID of cheaterSteamIDs)
 					displayAccountInfo(steamID);
-			} else if (options.s) {
-				inputSteamIDs = options.steamids;
-				console.log(inputSteamIDs);
-				filterAndDisplayInputSteamIDs();
 			} else if (options.t) {
 				console.log('Tailing log file located at: '+CSGO_LOG_PATH);
 				tailLogFile();
