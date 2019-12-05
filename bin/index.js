@@ -9,6 +9,7 @@ const pad = require("pad");
 const SteamID = require("steamid");
 const parseString = require("xml2js").parseString;
 const Tail = require('tail').Tail;
+const player = require('play-sound')();
 
 const options = yargs
 	.usage("Usage: Copy Steam2 IDs to clipboard and run.")
@@ -119,6 +120,9 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 		}
 
 		if (foundCheaterSteam2IDs.length > 0) {
+			player.play('./media/warning.mp3', function(err) {
+				if (err) throw err
+			})
 			console.log('\n'+`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
 			for (let steam2ID of foundCheaterSteam2IDs)
 	 			displayAccountInfo(steam2ID);
