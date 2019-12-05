@@ -118,10 +118,12 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 			}
 		}
 
-		if (foundCheaterSteam2IDs) {
+		if (foundCheaterSteam2IDs.length > 0) {
 			console.log('\n'+`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
 			for (let steam2ID of foundCheaterSteam2IDs)
 	 			displayAccountInfo(steam2ID);
+		} else {
+			foundSteam2IDs = []; // Didn't find any cheaters this this turn, proceed to clear cache and prepare for next collection.
 		}
 	}
 }
