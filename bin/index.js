@@ -8,23 +8,27 @@ const clipboardy = require("clipboardy");
 const pad = require("pad");
 const SteamID = require("steamid");
 const parseString = require("xml2js").parseString;
+const Tail = require('tail').Tail;
 
 const options = yargs
 	.usage("Usage: Copy Steam2 IDs to clipboard and run.")
 	.option("g", { alias: "game", describe: "Check Steam2 IDs from game.txt file." })
 	.option("i", { alias: "info", describe: "Read and display Steam2 IDs cheaters.txt" })
 	.option("s", { alias: "steamids", describe: "Display relevant info about a Steam2 ID(s)", type: "string"})
+	.option("t", { alias: "tail", describe: "Tail log file for live scanning." })
 	.argv;
 
 const PROFILES_URL = 'http://steamcommunity.com/profiles/';
 const XML_FLAG = '/?xml=1';
 const CHEATERS_JSON_URL = 'https://api.myjson.com/bins/ka6z8?pretty=1';
 const STEAMID_TO_DATES_JSON_URL = 'https://api.myjson.com/bins/sm9g4?pretty=1';
+const CSGO_LOG_PATH = 'logFile.log'; // file in same dir for dev.
 
 var cheaterSteamIDs = [];
 var steamIDDates = {};
 var inputSteamIDs = '';
 var foundSteam2IDs = [];
+var foundCheaterSteam2IDs = [];
 var requestCount = 0;
 
 // Stats collecting
@@ -68,6 +72,9 @@ function getSteamIDToDatesJSONURL() {
 				inputSteamIDs = options.steamids;
 				console.log(inputSteamIDs);
 				filterAndDisplayInputSteamIDs();
+			} else if (options.t) {
+				console.log('Tailing log file located at: '+CSGO_LOG_PATH+'\n');
+				tailLogFile();
 			} else {
 				inputSteamIDs = clipboardy.readSync();
 				filterAndDisplayInputSteamIDs();
@@ -78,9 +85,45 @@ function getSteamIDToDatesJSONURL() {
 		});
 })()
 
-function readGameTXT () {
-	var data = fs.readFileSync('game.txt', 'utf-8')
-	inputSteamIDs = data;
+
+function tailLogFile () {
+	tail = new Tail(CSGO_LOG_PATH);
+ 
+	tail.on("line", function(data) {
+		filterAndDisplayKnownCheaterSteam2IDs(data);
+	});
+ 
+	tail.on("error", function(error) {
+  		console.log('Tail ERROR: ', error);
+	});
+}
+
+function filterAndDisplayKnownCheaterSteam2IDs (data) {
+	var steam2IDRegex = /STEAM_[0-5]:[0-1]:([0-9]+)/g; // Same pattern as in SteamID
+	let foundSteam2IDsFromLogLine = data.match(steam2IDRegex);
+
+	// Collect Steam2IDs into foundSteam2IDs and trigger cheater check when #end is seen.
+	if (foundSteam2IDsFromLogLine) {
+		foundSteam2IDs.push(...foundSteam2IDsFromLogLine);
+	}
+
+	let logEndFlagRegex = /#end/;
+	let foundEndFlag = data.match(logEndFlagRegex);
+
+	// Can add some other checks to trigger once per game. Currently triggers every 'status', which is every tab press.
+	if (foundEndFlag) {
+		for (let foundSteam2ID of foundSteam2IDs) {
+			if (cheaterSteamIDs.includes(foundSteam2ID)) {
+				foundCheaterSteam2IDs.push(foundSteam2ID);
+			}
+		}
+
+		if (foundCheaterSteam2IDs) {
+			console.log(`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
+			for (let steam2ID of foundCheaterSteam2IDs)
+	 			displayAccountInfo(steam2ID);
+		}
+	}
 }
 
 function filterAndDisplayInputSteamIDs () {
@@ -93,6 +136,11 @@ function filterAndDisplayInputSteamIDs () {
 	} else {
 		console.log('No Steam2 IDs found.')
 	}
+}
+
+function readGameTXT () {
+	var data = fs.readFileSync('game.txt', 'utf-8')
+	inputSteamIDs = data;
 }
 
 function displayStats () {
@@ -238,6 +286,7 @@ function displayAccountInfo (steam2ID) {
 						isCheater = 'CHEATER';
 						cheatersFoundCount++;
 					}
+					
 					console.log(pad(vacBannedString, 3)+' || '+pad(isPrivate, 4)+' || '+pad(isNew, 3)+' || ' + pad(steamNickname.trim().substr(0, 19), 25) + pad(steam2ID, 20) + ' || ' + pad(accountAge, 5) + ' / '+ pad(memberSince, 20) + ' || ' + sidURL + ' || ' + isCheater);
 				}
 			});
@@ -250,11 +299,20 @@ function displayAccountInfo (steam2ID) {
 		.finally(function () {
 			requestCount++;
 
-			// Display the stats in the end when showing all cheaters (-i) or when processing of all accounts has finished (clipboard, -g).
-			if (((requestCount == cheaterSteamIDs.length) && options.i) || (requestCount == foundSteam2IDs.length)) {
-				console.log('\n');
-				displayStats();
-			} 
+			if (!options.t) { // only when not using log tailing (-t)
+				// Display the stats in the end when showing all cheaters (-i) or when processing of all accounts has finished (clipboard, -g).
+				if (((requestCount == cheaterSteamIDs.length) && options.i) || (requestCount == foundSteam2IDs.length)) {
+					console.log('\n');
+					displayStats();
+				}
+			}
+
+			// Empty Steam2ID cache storage and requestCount used in -t mode to prepare for next fetch.
+			if (options.t && (requestCount == foundCheaterSteam2IDs.length)) {
+				foundSteam2IDs = [];
+				foundCheaterSteam2IDs = [];
+				requestCount = 0;
+			}
 		}
 	);
 }
