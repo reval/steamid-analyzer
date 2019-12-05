@@ -63,7 +63,7 @@ function getSteamIDToDatesJSONURL() {
 			console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_URL}`);
 			console.log("\n");
 			if (options.g) {
-				readGameTXT();
+				inputSteamIDs = fs.readFileSync('game.txt', 'utf-8');
 				filterAndDisplayInputSteamIDs();
 			} else if (options.i) {
 				for (let steamID of cheaterSteamIDs)
@@ -73,7 +73,7 @@ function getSteamIDToDatesJSONURL() {
 				console.log(inputSteamIDs);
 				filterAndDisplayInputSteamIDs();
 			} else if (options.t) {
-				console.log('Tailing log file located at: '+CSGO_LOG_PATH+'\n');
+				console.log('Tailing log file located at: '+CSGO_LOG_PATH);
 				tailLogFile();
 			} else {
 				inputSteamIDs = clipboardy.readSync();
@@ -119,7 +119,7 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 		}
 
 		if (foundCheaterSteam2IDs) {
-			console.log(`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
+			console.log('\n'+`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
 			for (let steam2ID of foundCheaterSteam2IDs)
 	 			displayAccountInfo(steam2ID);
 		}
@@ -136,11 +136,6 @@ function filterAndDisplayInputSteamIDs () {
 	} else {
 		console.log('No Steam2 IDs found.')
 	}
-}
-
-function readGameTXT () {
-	var data = fs.readFileSync('game.txt', 'utf-8')
-	inputSteamIDs = data;
 }
 
 function displayStats () {
