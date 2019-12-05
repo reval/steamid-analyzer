@@ -108,7 +108,7 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 		foundSteam2IDs.push(...foundSteam2IDsFromLogLine);
 	}
 
-	let logEndFlagRegex = /#end/;
+	let logEndFlagRegex = /^#end$/;
 	let foundEndFlag = data.match(logEndFlagRegex);
 
 	// Can add some other checks to trigger once per game. Currently triggers every 'status', which is every tab press.
