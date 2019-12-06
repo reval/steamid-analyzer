@@ -15,8 +15,8 @@ Run with 'sid'
 HOWTO: https://thisdavej.com/node-js-playing-sounds-to-provide-notifications/
 
 2. Enable CS:GO console logging.
-In *"...\Program Files\Steam\userdata[your Steam ID]\730\local\cfg\autoexec.cfg"* add:
+In "...\Program Files\Steam\userdata[your Steam ID]\730\local\cfg\autoexec.cfg" add:
 con_logfile "conlog.log"
 
-Log will be written here. Point CSGO_LOG_PATH here:
-*"...\steamapps\common\Counter-Strike Global Offensive\csgo\conlog.log"*
+3. Point CSGO_LOG_PATH here:
+"...\steamapps\common\Counter-Strike Global Offensive\csgo\conlog.log"
