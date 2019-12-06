@@ -12,7 +12,7 @@ Run with 'sid'
 
 ##### Additional Setup Requirements for -t Mode:
 1. MPlayer (command line audio player): Required to play sound notifications on Windows.
-HOWTO: https://thisdavej.com/node-js-playing-sounds-to-provide-notifications/
+https://thisdavej.com/node-js-playing-sounds-to-provide-notifications/
 
 2. Enable CS:GO console logging.
 In "...\Program Files\Steam\userdata[your Steam ID]\730\local\cfg\autoexec.cfg" add:
