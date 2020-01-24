@@ -2,6 +2,11 @@
 Detect CS:GO cheaters using lists of Steam2IDs.
 Exposes private account age with ~1-3 month accuracy.
 
+## Setup
+1. Install Node.js
+2. Install Git
+3. Install VS Code
+
 ## Usage:
 Run with 'sid'
 
