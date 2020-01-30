@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+        "type": "node",
+        "request": "launch",
+        "name": "sid",
+        "program": "${workspaceFolder}/bin/index.js"
+        },
+        {
+        "type": "node",
+        "request": "launch",
+        "name": "sid -i",
+        "program": "${workspaceFolder}/bin/index.js",
+        "args":["-i"]
+        },
+        {
+        "type": "node",
+        "request": "launch",
+        "name": "sid -t",
+        "program": "${workspaceFolder}/bin/index.js",
+        "args":["-t"]
+        }
+    ]
+}
