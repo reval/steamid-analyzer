@@ -21,7 +21,7 @@ const PROFILES_URL = 'http://steamcommunity.com/profiles/';
 const XML_FLAG = '/?xml=1';
 const CHEATERS_JSON_URL = 'https://api.myjson.com/bins/ka6z8?pretty=1';
 const STEAMID_TO_DATES_JSON_URL = 'https://api.myjson.com/bins/sm9g4?pretty=1';
-const CSGO_LOG_PATH = 'logFile.log'; // file in same dir for dev.
+const CSGO_LOG_PATH = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\conlog.log'; // file in same dir for dev.
 
 var cheaterSteamIDs = [];
 var steamIDDates = {};
@@ -82,6 +82,7 @@ function tailLogFile () {
 	tail = new Tail(CSGO_LOG_PATH);
  
 	tail.on("line", function(data) {
+		console.log(data);
 		filterAndDisplayKnownCheaterSteam2IDs(data);
 	});
  
@@ -104,6 +105,7 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 
 	// Can add some other checks to trigger once per game. Currently triggers every 'status', which is every tab press.
 	if (foundEndFlag) {
+		console.log(foundSteam2IDs);
 		for (let foundSteam2ID of foundSteam2IDs) {
 			if (cheaterSteamIDs.includes(foundSteam2ID)) {
 				foundCheaterSteam2IDs.push(foundSteam2ID);
