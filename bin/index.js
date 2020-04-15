@@ -19,8 +19,8 @@ const options = yargs
 
 const PROFILES_URL = 'http://steamcommunity.com/profiles/';
 const XML_FLAG = '/?xml=1';
-const CHEATERS_JSON_URL = 'https://api.myjson.com/bins/ka6z8?pretty=1';
-const STEAMID_TO_DATES_JSON_URL = 'https://api.myjson.com/bins/sm9g4?pretty=1';
+const CHEATERS_JSON_PATH = 'data/cheaters.json';
+const STEAMID_TO_DATES_JSON_PATH = 'data/dates.json';
 const CSGO_LOG_PATH = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\conlog.log'; // file in same dir for dev.
 
 var cheaterSteamIDs = [];
@@ -43,40 +43,25 @@ var privateAccountCount = 0;
 var privateAndNewAccountCount = 0;
 var cheatersFoundCount = 0;
 
-function getCheaterJSONURL() {
-	return axios.get(CHEATERS_JSON_URL);
+let cheatersRawData = fs.readFileSync(CHEATERS_JSON_PATH);
+cheaterSteamIDs = JSON.parse(cheatersRawData);
+
+let datesRawData = fs.readFileSync(STEAMID_TO_DATES_JSON_PATH);
+steamIDDates = JSON.parse(datesRawData);
+
+console.log(`Loaded ${cheaterSteamIDs.length} cheaters from ${CHEATERS_JSON_PATH}`);
+console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_PATH}`);
+console.log("\n");
+if (options.i) {
+	for (let steamID of cheaterSteamIDs)
+		displayAccountInfo(steamID);
+} else if (options.t) {
+	console.log('Tailing log file located at: '+CSGO_LOG_PATH);
+	tailLogFile();
+} else {
+	inputSteamIDs = clipboardy.readSync();
+	filterAndDisplayInputSteamIDs();
 }
-   
-function getSteamIDToDatesJSONURL() {
-	return axios.get(STEAMID_TO_DATES_JSON_URL);
-}
-
-( async () => {
-	
-	axios.all([getCheaterJSONURL(), getSteamIDToDatesJSONURL()])
-		.then(axios.spread(function (cheaters, steamIDsToDates) {
-			cheaterSteamIDs = cheaters.data;
-			steamIDDates = steamIDsToDates.data;
-
-			console.log(`Loaded ${cheaterSteamIDs.length} cheaters from ${CHEATERS_JSON_URL}`);
-			console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_URL}`);
-			console.log("\n");
-			if (options.i) {
-				for (let steamID of cheaterSteamIDs)
-					displayAccountInfo(steamID);
-			} else if (options.t) {
-				console.log('Tailing log file located at: '+CSGO_LOG_PATH);
-				tailLogFile();
-			} else {
-				inputSteamIDs = clipboardy.readSync();
-				filterAndDisplayInputSteamIDs();
-			}
-		}))
-		.catch(function (error) {
-			console.log(`Initial data load failed: ${error}`);
-		});
-})()
-
 
 function tailLogFile () {
 	tail = new Tail(CSGO_LOG_PATH);
