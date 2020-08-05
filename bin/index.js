@@ -96,7 +96,7 @@ function filterAndDisplayKnownCheaterSteam2IDs (data) {
 			}
 		}
 
-		if (foundCheaterSteam2IDs.length > 0) {
+		if (foundCheaterSteam2IDs.length > 0) {a
 			console.log('\n'+`${foundCheaterSteam2IDs.length} cheater(s) found in your game.`)
 			for (let steam2ID of foundCheaterSteam2IDs)
 	 			displayAccountInfo(steam2ID);
