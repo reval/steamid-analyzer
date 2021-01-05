@@ -12,7 +12,7 @@
     "sid": "./bin/index.js"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "clipboardy": "^2.3.0",
     "date-arithmetic": "^4.1.0",
     "pad": "^3.2.0",
