@@ -49,6 +49,11 @@ var privateAccountCount = 0;
 var privateAndNewAccountCount = 0;
 var cheatersFoundCount = 0;
 var teamedWithCheaterFoundCount = 0;
+var groupsNA = 0;
+var groupsOneToTenExclusive = 0;
+var groupsTenToTwentyExclusive = 0;
+var groupsTwentyToThirtyExclusive = 0;
+var groupsThirtyPlus = 0;
 
 let cheatersRawData = fs.readFileSync(CHEATERS_JSON_PATH);
 cheaterSteamIDs = JSON.parse(cheatersRawData);
@@ -63,7 +68,7 @@ let existingCheaterGroupIDsRawData = fs.readFileSync(CHEATER_GROUP_IDS);
 existingCheaterGroupIDs = JSON.parse(existingCheaterGroupIDsRawData);
 
 console.log(`Loaded ${cheaterSteamIDs.length} cheaters from ${CHEATERS_JSON_PATH}`);
-console.log(`Loaded ${teamedWithCheaterSteamIDs.length} cheaters from ${TEAMED_WITH_CHEATER_JSON_PATH}`);
+console.log(`Loaded ${teamedWithCheaterSteamIDs.length} teamed with cheater from ${TEAMED_WITH_CHEATER_JSON_PATH}`);
 console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_PATH}`);
 console.log(`Loaded ${existingCheaterGroupIDs.length} cheater groups from ${CHEATER_GROUP_IDS}`)
 console.log("\n");
@@ -138,15 +143,16 @@ function displayStats () {
 	console.log(
 		'Known Cheaters: '+cheaterSteamIDs.length+'\n'+
 		'Cheaters Found: '+cheatersFoundCount+'\n'+
-		'Teamed With Cheater Found: '+teamedWithCheaterFoundCount+'\n'+
+		'Teamed With Cheaters Found: '+teamedWithCheaterFoundCount+'\n'+
 		'Accounts Processed: '+requestCount+'\n'+
-		'0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
-		'1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
-		'2-3: '+twoToThreeExclusive+'    '+'PRIV & NEW: '+privateAndNewAccountCount+'\n'+
-		'3-4: '+threeToFourExclusive+'\n'+
-		'4-5: '+fourToFiveExclusive+'\n'+
-		'5-10: '+fiveToTenExclusive+'\n'+
-		'10+: '+moreThanTen
+		'Age 0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
+		'Age 1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
+		'Age 2-3: '+twoToThreeExclusive+'    '+'PRIV & NEW: '+privateAndNewAccountCount+'\n'+
+		'Age 3-4: '+threeToFourExclusive+'    '+'Groups 0-10: '+groupsOneToTenExclusive+'\n'+
+		'Age 4-5: '+fourToFiveExclusive+'    '+'Groups 10-20: '+groupsTenToTwentyExclusive+'\n'+
+		'Age 5-10: '+fiveToTenExclusive+'   '+'Groups 20-30: '+groupsTwentyToThirtyExclusive+'\n'+
+		'Age 10+: '+moreThanTen+'    '+'Groups 30+: '+groupsThirtyPlus+'\n'+
+		'              '+'Groups N/A: '+groupsNA
 	);
 }
 
@@ -250,6 +256,21 @@ function recordAccountAgeStats(accountAge) {
 	}
 }
 
+function recordCheaterGroupsStats(cheaterGroups) {
+	if (cheaterGroups < 10) {
+		groupsOneToTenExclusive++;
+	}
+	else if (cheaterGroups >= 10 && cheaterGroups < 20) {
+		groupsTenToTwentyExclusive++;
+	}
+	else if (cheaterGroups >= 20 && cheaterGroups < 30) {
+		groupsTwentyToThirtyExclusive++;
+	}
+	else if (cheaterGroups >= 30) {
+		groupsThirtyPlus++;
+	}
+}
+
 function displayAccountInfo (steam2ID) {
 	var sid = new SteamID(steam2ID);
 	var sidURL = PROFILES_URL+sid.getSteamID64();
@@ -280,6 +301,13 @@ function displayAccountInfo (steam2ID) {
 								cheaterGroupsPartOf++;
 						}
 					}
+
+					if (!cheaterGroupsPartOf) {
+						cheaterGroupsPartOf = "N/A";
+						groupsNA++;
+					}
+					else
+						recordCheaterGroupsStats(cheaterGroupsPartOf);
 					
 					var memberSince = undefined;
 					var accountAge = undefined;
@@ -304,7 +332,7 @@ function displayAccountInfo (steam2ID) {
 					recordAccountAgeStats(accountAge);
 
 					var isNew = '';
-					if (accountAge < 0.083)
+					if (accountAge <= 0.5)
 						isNew = 'NEW';
 
 					if (accountAge < 1 && isPrivate)
@@ -332,17 +360,18 @@ function displayAccountInfo (steam2ID) {
 						teamedWithCheaterFoundCount++;
 					}
 					
-					console.log(pad(vacBannedString, 3)+' || '
+					console.log(
+					pad(isCheater, 7)+' || '
+					+pad(vacBannedString, 3)+' || '
 					+pad(isPrivate, 4)+' || '
 					+pad(isNew, 3)+' || '
 					+pad(hasTeamedWithCheater, 1)+' || '
-					+pad(steamNickname.trim().substr(0, 19), 25) 
-					+pad(steam2ID, 20) + ' || ' 
-					+pad(accountAge, 5) + ' / '
-					+pad(memberSince, 20) + ' || '
-					+sidURL + ' || ' 
-					+'G: '+ cheaterGroupsPartOf + ' || '
-					+isCheater );
+					+'Age: '+pad(accountAge, 5) + ' || '
+					+'Groups: '+ pad(cheaterGroupsPartOf.toString(), 4) + ' || '
+					+pad(steam2ID, 19) + ' || ' 
+					+sidURL + ' || '
+					+pad(steamNickname.trim().substr(0, 20), 25) 
+					);
 				}
 			});
 		})
