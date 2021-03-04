@@ -19,11 +19,13 @@ const options = yargs
 const PROFILES_URL = 'http://steamcommunity.com/profiles/';
 const XML_FLAG = '/?xml=1';
 const CHEATERS_JSON_PATH = 'data/cheaters.json';
+const TEAMED_WITH_CHEATER_JSON_PATH = 'data/teamed_with_cheater.json';
 const STEAMID_TO_DATES_JSON_PATH = 'data/dates.json';
 const CHEATER_GROUP_IDS = 'data/cheater_group_ids.json';
 const CSGO_LOG_PATH = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\conlog.log'; // file in same dir for dev.
 
 var cheaterSteamIDs = [];
+var teamedWithCheaterSteamIDs = [];
 var steamIDDates = {};
 var inputSteamIDs = '';
 var foundSteam2IDs = [];
@@ -46,9 +48,13 @@ var vacBannedCount = 0;
 var privateAccountCount = 0;
 var privateAndNewAccountCount = 0;
 var cheatersFoundCount = 0;
+var teamedWithCheaterFoundCount = 0;
 
 let cheatersRawData = fs.readFileSync(CHEATERS_JSON_PATH);
 cheaterSteamIDs = JSON.parse(cheatersRawData);
+
+let teamedWithCheaterRawData = fs.readFileSync(TEAMED_WITH_CHEATER_JSON_PATH);
+teamedWithCheaterSteamIDs = JSON.parse(teamedWithCheaterRawData);
 
 let datesRawData = fs.readFileSync(STEAMID_TO_DATES_JSON_PATH);
 steamIDDates = JSON.parse(datesRawData);
@@ -57,6 +63,7 @@ let existingCheaterGroupIDsRawData = fs.readFileSync(CHEATER_GROUP_IDS);
 existingCheaterGroupIDs = JSON.parse(existingCheaterGroupIDsRawData);
 
 console.log(`Loaded ${cheaterSteamIDs.length} cheaters from ${CHEATERS_JSON_PATH}`);
+console.log(`Loaded ${teamedWithCheaterSteamIDs.length} cheaters from ${TEAMED_WITH_CHEATER_JSON_PATH}`);
 console.log(`Loaded ${Object.keys(steamIDDates).length} dates for private account date checking from ${STEAMID_TO_DATES_JSON_PATH}`);
 console.log(`Loaded ${existingCheaterGroupIDs.length} cheater groups from ${CHEATER_GROUP_IDS}`)
 console.log("\n");
@@ -131,6 +138,7 @@ function displayStats () {
 	console.log(
 		'Known Cheaters: '+cheaterSteamIDs.length+'\n'+
 		'Cheaters Found: '+cheatersFoundCount+'\n'+
+		'Teamed With Cheater Found: '+teamedWithCheaterFoundCount+'\n'+
 		'Accounts Processed: '+requestCount+'\n'+
 		'0-1: '+lessThanOne+'    '+'VAC: '+vacBannedCount+'\n'+
 		'1-2: '+oneToTwoExclusive+'    '+'PRIV: '+privateAccountCount+'\n'+
@@ -296,7 +304,7 @@ function displayAccountInfo (steam2ID) {
 					recordAccountAgeStats(accountAge);
 
 					var isNew = '';
-					if (accountAge < 1)
+					if (accountAge < 0.083)
 						isNew = 'NEW';
 
 					if (accountAge < 1 && isPrivate)
@@ -317,17 +325,24 @@ function displayAccountInfo (steam2ID) {
 							}
 						}
 					}
-						
+
+					var hasTeamedWithCheater = '';
+					if (teamedWithCheaterSteamIDs.includes(steam2ID)) {
+						hasTeamedWithCheater = 'T';
+						teamedWithCheaterFoundCount++;
+					}
+					
 					console.log(pad(vacBannedString, 3)+' || '
 					+pad(isPrivate, 4)+' || '
-					+pad(isNew, 3)+' || ' 
-					+ pad(steamNickname.trim().substr(0, 19), 25) 
-					+ pad(steam2ID, 20) + ' || ' 
-					+ pad(accountAge, 5) + ' / '
-					+ pad(memberSince, 20) + ' || '
-					+ sidURL + ' || ' 
-					+ 'Groups: '+ cheaterGroupsPartOf + ' || '
-					+ isCheater);
+					+pad(isNew, 3)+' || '
+					+pad(hasTeamedWithCheater, 1)+' || '
+					+pad(steamNickname.trim().substr(0, 19), 25) 
+					+pad(steam2ID, 20) + ' || ' 
+					+pad(accountAge, 5) + ' / '
+					+pad(memberSince, 20) + ' || '
+					+sidURL + ' || ' 
+					+'G: '+ cheaterGroupsPartOf + ' || '
+					+isCheater );
 				}
 			});
 		})
