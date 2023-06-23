@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "clipboardy": "^2.3.0",
+    "clipboardy": "^3.0.0",
     "date-arithmetic": "^4.1.0",
     "pad": "^3.2.0",
     "steamid": "^1.1.3",
